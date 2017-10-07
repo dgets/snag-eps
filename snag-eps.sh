@@ -3,23 +3,70 @@
 #by Damon Getsman
 #start: 6 Oct 17
 #
-#Just a little script that will automate snagging of multiple episodes of a
+#Just a little script that will automate snagging of multiple files of a
 #series that has sequential similar filenames from a web host.  I may end up
-#adding support for ftp protocol and directory mirroring at some point.  It'd
-#also be nice to have some sed work that'll handle things so that we only need
-#one complete URL.  Can't be too hard to construct them from that.
+#adding support for ftp & directory mirroring at some point.  It'd also be nice
+#to have some sed work that'll handle things so that we only need one complete
+#URL.  Can't be too hard to construct them from that.
 
-#not worrying about support for multiple seasons in one directory yet
+init() {
+	TRUE=1
+	FALSE=0
+	WGET=`which wget`
+
+	urlString1=$1
+	urlString2=$2
+	min=$3
+	max=$4
+
+	return
+}
 
 dump_usage() {
-	echo Usage:\t$0 urlString1 urlString2 min max
-	echo \t\tConcats urlString1 + \(min \<= ep\# \<=max\) + urlString2
-	echo \t\tfor wgetting each successive URL
+	#so yeah, this description is wrong; must've been haigh
+	echo "Usage:\t$0 urlString1 urlString2 min max"
+	echo "\t\tConcats urlString1 + (min <= ep# <=max) + urlString2"
+	echo "\t\tfor wgetting each successive URL; if the min value"
+	echo "\t\tcontains a preceding '0', all single digit numbers will"
+        echo "\t\tfollow suit."
+
+	exit
+}
+
+determine_numbering_scheme() {
+	#well, fugly, but this _is_ shellscript, and it _is_ POSIX compliant
+	minStartChar=`echo "$min" | fold -w1 | head -n 1`
+
+	#0 prepending scheme?
+	if [ $minStartChar = "0" ] ; then
+		prep0=$TRUE
+	else
+		prep0=$FALSE
+	fi
+
+	return prep0
 }
 
 #main script entry
-if [ ($# -eq 0) || ($# -ne 4) ] ; then
-	dump_usage
+init
+
+if [ $# -eq 0 ] ; then
+	if [ $# -ne 4 ] ; then
+		dump_usage
+	fi
 fi
 
+
+for cntr in {$min..$max} ; do
+	leading_zero=determine_numbering_scheme
+	
+	if [ $leading_zero -eq $TRUE ] ; then
+		num="0$cntr"
+	else
+		num=$cntr
+	fi
+
+	completeURL="${urlString1}${num}${urlString2}"
+	$WGET $completeURL
+done
 
