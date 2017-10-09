@@ -22,33 +22,32 @@ init() {
 	return
 }
 
-dump_usage() {
+usage() {
 	#so yeah, this description is wrong; must've been haigh
 	echo "Usage:\t$0 urlString1 urlString2 min max"
 	echo "\t\tConcats urlString1 + (min <= ep# <=max) + urlString2"
 	echo "\t\tfor wgetting each successive URL; if the min value"
 	echo "\t\tcontains a preceding '0', all single digit numbers will"
-        echo "\t\tfollow suit."
+    echo "\t\tfollow suit."
 
-	exit
+	exit 1
 }
 
 determine_numbering_scheme() {
 	#well, fugly, but this _is_ shellscript, and it _is_ POSIX compliant
-	minStartChar=`echo "$min" | fold -w1 | head -n 1`
+	minStartChar=$(echo "$min" | fold -w1 | head -n 1)
 
-	#0 prepending scheme?
-	if [ $minStartChar = "0" ] ; then
+	if [ "$minStartChar" = "0" ]; then
 		prep0=$TRUE
 	else
 		prep0=$FALSE
 	fi
 
-	return prep0
+	return "$prep0"
 }
 
 #main script entry
-init
+init $1 $2 $3 $4
 
 if [ $# -eq 0 ] ; then
 	if [ $# -ne 4 ] ; then
@@ -56,10 +55,10 @@ if [ $# -eq 0 ] ; then
 	fi
 fi
 
+determine_numbering_scheme $min
+leading_zero=$?
 
-for cntr in {$min..$max} ; do
-	leading_zero=determine_numbering_scheme
-	
+for cntr in $(seq $min $max) ; do
 	if [ $leading_zero -eq $TRUE ] ; then
 		num="0$cntr"
 	else
