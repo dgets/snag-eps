@@ -49,10 +49,8 @@ determine_numbering_scheme() {
 #main script entry
 init $1 $2 $3 $4
 
-if [ $# -eq 0 ] ; then
-	if [ $# -ne 4 ] ; then
-		dump_usage
-	fi
+if [ $# -ne 4 ] ; then
+	dump_usage
 fi
 
 determine_numbering_scheme $min
