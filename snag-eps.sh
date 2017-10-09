@@ -28,7 +28,7 @@ usage() {
 	printf "\t\tConcats urlString1 + (min <= ep# <=max) + urlString2\n"
 	printf "\t\tfor wgetting each successive URL; if the min value\n"
 	printf "\t\tcontains a preceding '0', all single digit numbers will\n"
-    printf "\t\tfollow suit.\n"
+	printf "\t\tfollow suit.\n"
 
 	exit 1
 }
@@ -56,14 +56,25 @@ fi
 determine_numbering_scheme $min
 leading_zero=$?
 
+#are we going to have issues with $max if it's had a '0' prepended by the user
+#as well?
+
 for cntr in $(seq $min $max) ; do
+	#if num is parsed straight from the command line we may need to prune
+	#the '0' that we just determined the potential leading zero on
 	if [ $leading_zero -eq $TRUE ] ; then
-		num="0$cntr"
+		if [ $cntr -lt 10 ] ; then
+			#so yeah, no double zeros here
+			num="0$cntr"
+		else
+			num=$cntr
+		fi
 	else
 		num=$cntr
 	fi
 
 	completeURL="${urlString1}${num}${urlString2}"
+	#okay, so now $completeURL is ending up in all lower case?  wtf
 	$WGET $completeURL
 done
 
