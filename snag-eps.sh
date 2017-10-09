@@ -24,11 +24,11 @@ init() {
 
 usage() {
 	#so yeah, this description is wrong; must've been haigh
-	echo "Usage:\t$0 urlString1 urlString2 min max"
-	echo "\t\tConcats urlString1 + (min <= ep# <=max) + urlString2"
-	echo "\t\tfor wgetting each successive URL; if the min value"
-	echo "\t\tcontains a preceding '0', all single digit numbers will"
-    echo "\t\tfollow suit."
+	printf "Usage:\t%s urlString1 urlString2 min max\n" "$0"
+	printf "\t\tConcats urlString1 + (min <= ep# <=max) + urlString2\n"
+	printf "\t\tfor wgetting each successive URL; if the min value\n"
+	printf "\t\tcontains a preceding '0', all single digit numbers will\n"
+    printf "\t\tfollow suit.\n"
 
 	exit 1
 }
@@ -50,7 +50,7 @@ determine_numbering_scheme() {
 init $1 $2 $3 $4
 
 if [ $# -ne 4 ] ; then
-	dump_usage
+	usage
 fi
 
 determine_numbering_scheme $min
