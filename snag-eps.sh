@@ -50,16 +50,14 @@ determine_numbering_scheme() {
 #main script entry
 init
 
-if [ $# -eq 0 ] ; then
-	if [ $# -ne 4 ] ; then
-		dump_usage
-	fi
+if [ $# -ne 4 ] ; then
+	dump_usage
 fi
 
 
 for cntr in {$min..$max} ; do
 	leading_zero=determine_numbering_scheme
-	
+
 	if [ $leading_zero -eq $TRUE ] ; then
 		num="0$cntr"
 	else
