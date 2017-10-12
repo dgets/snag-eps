@@ -12,6 +12,7 @@
 init() {
 	TRUE=1
 	FALSE=0
+	DEBUGGING=$FALSE
 	WGET=$(which wget)
 
 	urlString1=$1
@@ -36,6 +37,10 @@ usage() {
 determine_numbering_scheme() {
 	#well, fugly, but this _is_ shellscript, and it _is_ POSIX compliant
 	minStartChar=$(echo "$min" | fold -w1 | head -n 1)
+
+	if [ $DEBUGGING -eq $TRUE ] ; then
+		echo "\$minStartChar: $minStartChar"
+	fi
 
 	if [ "$minStartChar" = "0" ]; then
 		prep0=$TRUE
@@ -72,6 +77,10 @@ while [ $counter -le $((max)) ]; do
 	fi
 
 	completeURL="${urlString1}${num}${urlString2}"
-	$WGET "$completeURL"
+	if [ $DEBUGGING -eq $TRUE ] ; then
+		echo Unquoted: ${urlString1}${num}${urlString2}
+	fi
+
+	$WGET $completeURL
 	counter=$((counter + 1))
 done
