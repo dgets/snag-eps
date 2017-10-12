@@ -12,7 +12,7 @@
 init() {
 	TRUE=1
 	FALSE=0
-	WGET=`which wget`
+	WGET=$(which wget)
 
 	urlString1=$1
 	urlString2=$2
@@ -47,34 +47,27 @@ determine_numbering_scheme() {
 }
 
 #main script entry
-init $1 $2 $3 $4
+init "$1" "$2" "$3" "$4"
 
 if [ $# -ne 4 ] ; then
 	usage
 fi
 
-determine_numbering_scheme $min
+determine_numbering_scheme
 leading_zero=$?
 
-#are we going to have issues with $max if it's had a '0' prepended by the user
-#as well?
-
-for cntr in $(seq $min $max) ; do
+counter=$((min))
+while [ $counter -le $((max)) ]; do
 	#if num is parsed straight from the command line we may need to prune
 	#the '0' that we just determined the potential leading zero on
-	if [ $leading_zero -eq $TRUE ] ; then
-		if [ $cntr -lt 10 ] ; then
-			#so yeah, no double zeros here
-			num="0$cntr"
-		else
-			num=$cntr
-		fi
+	if [ $leading_zero -eq $TRUE ] && [ $counter -lt 10 ] ; then
+		#so yeah, no double zeros here
+		num="0$counter"
 	else
-		num=$cntr
+		num=$counter
 	fi
 
 	completeURL="${urlString1}${num}${urlString2}"
-	#okay, so now $completeURL is ending up in all lower case?  wtf
-	$WGET $completeURL
+	$WGET "$completeURL"
+	counter=$((counter + 1))
 done
-
