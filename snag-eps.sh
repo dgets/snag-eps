@@ -51,6 +51,10 @@ init "$1" "$2" "$3" "$4"
 
 if [ $# -ne 4 ] ; then
 	usage
+else
+	#this line makes me think it's time to add a verbose flag :P
+	echo -n "$1 - $2 "
+	echo "- $3 - $4"
 fi
 
 determine_numbering_scheme
