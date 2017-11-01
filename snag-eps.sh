@@ -113,7 +113,7 @@ determine_mode() {
 
 #main script entry
 init 	#"$1" "$2" "$3" "$4"	#previous combined init()
-determine_mode
+determine_mode	"$1" "$2" "$3" "$4"
 
 if [ $? -eq $PRIMITIVE ] ; then
 	if [ $DEBUGGING -eq $TRUE ] ; then
