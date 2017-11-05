@@ -18,7 +18,13 @@ init() {
 
 	DEBUGGING=$TRUE
 	#VERBOSE=$FALSE
-	WGET=$(which wget)
+	WHICH='/usr/bin/which'	#hopefully this doesn't need changing :P
+	WGET=$($WHICH wget)
+	#ECHO=$($WHICH echo)
+	FOLD=$($WHICH fold)
+	HEAD=$($WHICH head)
+	CUT=$($WHICH cut)
+	PRINTF=$($WHICH printf)
 
 	return
 }
@@ -45,17 +51,17 @@ init1() {
 
 usage() {
 	#so yeah, this description is wrong; must've been haigh
-	printf "Usage:\t%s urlString1 urlString2 min max\n" "$0"
-	printf "\t\tConcats urlString1 + (min <= ep# <=max) + urlString2\n"
-	printf "\t\tfor wgetting each successive URL; if the min value\n"
-	printf "\t\tcontains a preceding '0', all single digit numbers will\n"
-	printf "\t\tfollow suit.\n\n"
+	$PRINTF "Usage:\t%s urlString1 urlString2 min max\n" "$0"
+	$PRINTF "\t\tConcats urlString1 + (min <= ep# <=max) + urlString2\n"
+	$PRINTF "\t\tfor wgetting each successive URL; if the min value\n"
+	$PRINTF "\t\tcontains a preceding '0', all single digit numbers will\n"
+	$PRINTF "\t\tfollow suit.\n\n"
 
 	if [ $DEBUGGING -eq $TRUE ] ; then
-		printf "Debugging:\n"
-		printf "Usage:\t%s -n urlString delimiter min max\n" "$0"
-		printf "\t\tNew usage; splits urlString using delimiter & "
-		printf "min.\n"
+		$PRINTF "Debugging:\n"
+		$PRINTF "Usage:\t%s -n urlString delimiter min max\n" "$0"
+		$PRINTF "\t\tNew usage; splits urlString using delimiter & "
+		$PRINTF "min.\n"
 	fi
 
 	exit 1
@@ -63,7 +69,7 @@ usage() {
 
 determine_numbering_scheme() {
 	#well, fugly, but this _is_ shellscript, and it _is_ POSIX compliant
-	minStartChar=$(echo "$min" | fold -w1 | head -n 1)
+	minStartChar=$(echo "$min" | $FOLD -w1 | $HEAD -n 1)
 
 	if [ $DEBUGGING -eq $TRUE ] ; then
 		echo "\$minStartChar: $minStartChar"
@@ -73,6 +79,21 @@ determine_numbering_scheme() {
 		prep0=$TRUE
 	else
 		prep0=$FALSE
+	fi
+
+	#do we need to get rid of a prepended '0' at the end of $max?
+	#obviously, $minStartChar has evolved beyond its original name scope
+	minStartChar=$(echo "$max" | $FOLD -w1 | $HEAD -n 1)
+
+
+	if [ "$minStartChar" = "0" ]; then
+		if [ $DEBUGGING -eq $TRUE ] ; then
+			echo "Chopping \$max (first char $minStartChar)"
+		fi
+		max=$(echo "$max" | $CUT -c 2-)
+		if [ $DEBUGGING -eq $TRUE ] ; then
+			echo "\$max: $max"
+		fi
 	fi
 
 	return "$prep0"
@@ -133,6 +154,10 @@ determine_numbering_scheme
 leading_zero=$?
 
 counter=$((min))
+#in the following conditional, $max MAY be entered as a 0x digit; if this is
+#the case we'll need to prune that frontal 0
+#
+#going to handle this in determine_numbering_scheme() above
 while [ $counter -le $((max)) ]; do
 	#if num is parsed straight from the command line we may need to prune
 	#the '0' that we just determined the potential leading zero on
